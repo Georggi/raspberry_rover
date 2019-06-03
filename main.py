@@ -151,5 +151,6 @@ if __name__ == "__main__":
                 doExit = True
             execPWMChanges()
             print(data)
+            s.send(bytes([255]))
         gpio.cleanup()
         s.close()

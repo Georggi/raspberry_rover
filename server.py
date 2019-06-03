@@ -36,5 +36,6 @@ if __name__ == "__main__":
                 conn.send(data_to_send[pressed])
             if pressed == 'K':
                 doExit = True
+            data = conn.recv(1)
         s.close()
 
