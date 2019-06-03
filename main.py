@@ -2,10 +2,12 @@ import RPi.GPIO as gpio
 import time
 import socket
 
+
 ip = '37.25.11.30'
 port = 60100
 
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
+
 
 
 def execPWMChanges():
@@ -18,13 +20,11 @@ def execPWMChanges():
 def shift_turnRight():
     pwm_vals[0] = pwm_vals[1] = pwm_vals[2] = 0
     pwm_vals[3] = 100
-    execPWMChanges()
 
 
 def shift_turnLeft():
     pwm_vals[3] = pwm_vals[1] = pwm_vals[2] = 0
     pwm_vals[0] = 100
-    execPWMChanges()
 
 
 def forward_turnLeft():
@@ -35,7 +35,6 @@ def forward_turnLeft():
         pwm_vals[0] += 25
     if pwm_vals[3] < 50:
         pwm_vals[3] += 12.5
-    execPWMChanges()
 
 
 def forward_turnRight():
@@ -46,7 +45,6 @@ def forward_turnRight():
         pwm_vals[3] += 25
     if pwm_vals[0] < 50:
         pwm_vals[0] += 12.5
-    execPWMChanges()
 
 
 def back_turnLeft():
@@ -57,7 +55,6 @@ def back_turnLeft():
         pwm_vals[1] += 25
     if pwm_vals[2] < 50:
         pwm_vals[2] += 12.5
-    execPWMChanges()
 
 
 def back_turnRight():
@@ -68,45 +65,37 @@ def back_turnRight():
         pwm_vals[2] += 25
     if pwm_vals[1] < 50:
         pwm_vals[1] += 12.5
-    execPWMChanges()
 
 
 def forward():
     pwm_vals[1] = pwm_vals[2] = 0
     pwm_vals[0] += 25
     pwm_vals[3] += 25
-    execPWMChanges()
 
 
 def back():
     pwm_vals[0] = pwm_vals[3] = 0
     pwm_vals[1] += 25
     pwm_vals[2] += 25
-    execPWMChanges()
 
 
 def fastRight():
     pwm_vals[0] = pwm_vals[2] = 0
     pwm_vals[3] = pwm_vals[1] = 100
-    execPWMChanges()
 
 
 def fastLeft():
     pwm_vals[3] = pwm_vals[1] = 0
     pwm_vals[0] = pwm_vals[2] = 100
-    execPWMChanges()
 
 
 def gradualStop():
     for i in range(0, len(pwm_vals)):
-        pwm_vals[i] -= 5
-    execPWMChanges()
-    time.sleep(0.1)
+        pwm_vals[i] -= 12.5
 
 def emergencyStop():
     for i in range(0, len(pwm_vals)):
         pwm_vals[i] = 0
-    execPWMChanges()
 
 
 if __name__ == "__main__":
@@ -132,7 +121,32 @@ if __name__ == "__main__":
     s.close()
     while not doExit:
         data = s.recv(1)
-        if data:
+        if data == bytes([0]):
+            gradualStop()
+        elif data == bytes([1]):
+            gradualStop()
+        elif data == bytes([2]):
+            gradualStop()
+        elif data == bytes([3]):
+            gradualStop()
+        elif data == bytes([4]):
+            gradualStop()
+        elif data == bytes([5]):
+            gradualStop()
+        elif data == bytes([6]):
+            gradualStop()
+        elif data == bytes([7]):
+            gradualStop()
+        elif data == bytes([8]):
+            gradualStop()
+        elif data == bytes([9]):
+            gradualStop()
+        elif data == bytes([10]):
+            gradualStop()
+        elif data == bytes([127]):
+            gradualStop()
+        elif data == bytes([255]):
             doExit = True
+        execPWMChanges()
         print(data)
     gpio.cleanup()
