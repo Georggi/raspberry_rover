@@ -12,6 +12,11 @@ pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
 def execPWMChanges():
     print(pwm_vals)
+    for i in range(0, len(pwm_vals)):
+        if pwm_vals[i] > 100:
+            pwm_vals[i] = 100
+        if pwm_vals < 0:
+            pwm_vals[i] = 0
     pwm_right_forward.ChangeDutyCycle(pwm_vals[0])
     pwm_right_back.ChangeDutyCycle(pwm_vals[1])
     pwm_left_back.ChangeDutyCycle(pwm_vals[2])
