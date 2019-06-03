@@ -34,8 +34,9 @@ if __name__ == "__main__":
             print(pressed)
             if pressed in data_to_send.keys():
                 conn.send(data_to_send[pressed])
+                data = conn.recv(1)
             if pressed == 'K':
                 doExit = True
-            data = conn.recv(1)
+
         s.close()
 

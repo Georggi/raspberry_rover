@@ -126,27 +126,27 @@ if __name__ == "__main__":
             if data == bytes([0]):
                 gradualStop()
             elif data == bytes([1]):
-                gradualStop()
+                forward()
             elif data == bytes([2]):
-                gradualStop()
+                back()
             elif data == bytes([3]):
-                gradualStop()
+                fastLeft()
             elif data == bytes([4]):
-                gradualStop()
+                fastRight()
             elif data == bytes([5]):
-                gradualStop()
+                forward_turnRight()
             elif data == bytes([6]):
-                gradualStop()
+                forward_turnLeft()
             elif data == bytes([7]):
-                gradualStop()
+                back_turnRight()
             elif data == bytes([8]):
-                gradualStop()
+                back_turnLeft()
             elif data == bytes([9]):
-                gradualStop()
+                shift_turnLeft()
             elif data == bytes([10]):
-                gradualStop()
+                shift_turnRight()
             elif data == bytes([127]):
-                gradualStop()
+                emergencyStop()
             elif data == bytes([255]):
                 doExit = True
             execPWMChanges()
