@@ -91,12 +91,12 @@ def back():
 
 def fastRight():
     pwm_vals[0] = pwm_vals[2] = 0
-    pwm_vals[3] = pwm_vals[1] = 25
+    pwm_vals[3] = pwm_vals[1] = 35
 
 
 def fastLeft():
     pwm_vals[3] = pwm_vals[1] = 0
-    pwm_vals[0] = pwm_vals[2] = 25
+    pwm_vals[0] = pwm_vals[2] = 35
 
 
 def gradualStop():
