@@ -106,47 +106,47 @@ if __name__ == "__main__":
             print("Host server " + ip + ":" + str(port) + " not started")
             exit(1)
 
-    gpio.setmode(gpio.BOARD)
-    gpio.setup(11, gpio.OUT)
-    gpio.setup(13, gpio.OUT)
-    gpio.setup(16, gpio.OUT)
-    gpio.setup(18, gpio.OUT)
-    pwm_right_forward = gpio.PWM(11,1000)
-    pwm_right_back = gpio.PWM(13,1000)
-    pwm_left_back = gpio.PWM(16,1000)
-    pwm_left_forward = gpio.PWM(18,1000)
-    s.settimeout(100)
-    doExit = False
+        gpio.setmode(gpio.BOARD)
+        gpio.setup(11, gpio.OUT)
+        gpio.setup(13, gpio.OUT)
+        gpio.setup(16, gpio.OUT)
+        gpio.setup(18, gpio.OUT)
+        pwm_right_forward = gpio.PWM(11,1000)
+        pwm_right_back = gpio.PWM(13,1000)
+        pwm_left_back = gpio.PWM(16,1000)
+        pwm_left_forward = gpio.PWM(18,1000)
+        s.settimeout(100)
+        doExit = False
 
-    s.close()
-    while not doExit:
-        data = s.recv(1)
-        if data == bytes([0]):
-            gradualStop()
-        elif data == bytes([1]):
-            gradualStop()
-        elif data == bytes([2]):
-            gradualStop()
-        elif data == bytes([3]):
-            gradualStop()
-        elif data == bytes([4]):
-            gradualStop()
-        elif data == bytes([5]):
-            gradualStop()
-        elif data == bytes([6]):
-            gradualStop()
-        elif data == bytes([7]):
-            gradualStop()
-        elif data == bytes([8]):
-            gradualStop()
-        elif data == bytes([9]):
-            gradualStop()
-        elif data == bytes([10]):
-            gradualStop()
-        elif data == bytes([127]):
-            gradualStop()
-        elif data == bytes([255]):
-            doExit = True
-        execPWMChanges()
-        print(data)
-    gpio.cleanup()
+        s.close()
+        while not doExit:
+            data = s.recv(1)
+            if data == bytes([0]):
+                gradualStop()
+            elif data == bytes([1]):
+                gradualStop()
+            elif data == bytes([2]):
+                gradualStop()
+            elif data == bytes([3]):
+                gradualStop()
+            elif data == bytes([4]):
+                gradualStop()
+            elif data == bytes([5]):
+                gradualStop()
+            elif data == bytes([6]):
+                gradualStop()
+            elif data == bytes([7]):
+                gradualStop()
+            elif data == bytes([8]):
+                gradualStop()
+            elif data == bytes([9]):
+                gradualStop()
+            elif data == bytes([10]):
+                gradualStop()
+            elif data == bytes([127]):
+                gradualStop()
+            elif data == bytes([255]):
+                doExit = True
+            execPWMChanges()
+            print(data)
+        gpio.cleanup()

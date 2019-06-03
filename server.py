@@ -26,6 +26,7 @@ if __name__ == "__main__":
         s.listen(5)
 
         conn, addr = s.accept()
+        print("receiver connection from " + addr)
         doExit = False
         while not doExit:
             pressed = ''.join(keys.key_check())
