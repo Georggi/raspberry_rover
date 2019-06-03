@@ -28,11 +28,12 @@ if __name__ == "__main__":
         conn, addr = s.accept()
         print("receiver connection from " + addr[0])
         doExit = False
+        time.sleep(1)
         while not doExit:
             pressed = ''.join(keys.key_check())
             print(pressed)
-            if pressed in data_to_send:
-                s.send(data_to_send[pressed])
+            if pressed in data_to_send.keys():
+                conn.send(data_to_send[pressed])
             if pressed == 'K':
                 doExit = True
         s.close()

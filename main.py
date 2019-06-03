@@ -11,6 +11,7 @@ pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
 
 def execPWMChanges():
+    print(pwm_vals)
     pwm_right_forward.ChangeDutyCycle(pwm_vals[0])
     pwm_right_back.ChangeDutyCycle(pwm_vals[1])
     pwm_left_back.ChangeDutyCycle(pwm_vals[2])
@@ -117,7 +118,6 @@ if __name__ == "__main__":
         pwm_left_forward = gpio.PWM(18,1000)
         s.settimeout(100)
         doExit = False
-
 
         while not doExit:
             data = s.recv(1)
