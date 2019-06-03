@@ -75,10 +75,10 @@ def back_turnRight():
 
 def forward():
     pwm_vals[1] = pwm_vals[2] = 0
-    if pwm_vals[0] < 25:
-        pwm_vals[0] += 12.5
-    if pwm_vals[3] < 25:
-        pwm_vals[3] += 12.5
+    if pwm_vals[0] < 100:
+        pwm_vals[0] += 25
+    if pwm_vals[3] < 100:
+        pwm_vals[3] += 25
 
 
 def back():
@@ -91,12 +91,12 @@ def back():
 
 def fastRight():
     pwm_vals[0] = pwm_vals[2] = 0
-    pwm_vals[3] = pwm_vals[1] = 100
+    pwm_vals[3] = pwm_vals[1] = 25
 
 
 def fastLeft():
     pwm_vals[3] = pwm_vals[1] = 0
-    pwm_vals[0] = pwm_vals[2] = 100
+    pwm_vals[0] = pwm_vals[2] = 25
 
 
 def gradualStop():
