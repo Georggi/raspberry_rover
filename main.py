@@ -75,10 +75,10 @@ def back_turnRight():
 
 def forward():
     pwm_vals[1] = pwm_vals[2] = 0
-    if pwm_vals[0] < 100:
-        pwm_vals[0] += 25
-    if pwm_vals[3] < 100:
-        pwm_vals[3] += 25
+    if pwm_vals[0] < 25:
+        pwm_vals[0] += 12.5
+    if pwm_vals[3] < 25:
+        pwm_vals[3] += 12.5
 
 
 def back():
