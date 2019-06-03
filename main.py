@@ -118,7 +118,7 @@ if __name__ == "__main__":
         s.settimeout(100)
         doExit = False
 
-        s.close()
+
         while not doExit:
             data = s.recv(1)
             time.sleep(0.1)
@@ -151,3 +151,4 @@ if __name__ == "__main__":
             execPWMChanges()
             print(data)
         gpio.cleanup()
+        s.close()
