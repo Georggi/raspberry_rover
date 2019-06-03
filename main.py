@@ -121,6 +121,7 @@ if __name__ == "__main__":
         s.close()
         while not doExit:
             data = s.recv(1)
+            time.sleep(0.1)
             if data == bytes([0]):
                 gradualStop()
             elif data == bytes([1]):

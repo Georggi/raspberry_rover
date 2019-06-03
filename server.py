@@ -30,7 +30,9 @@ if __name__ == "__main__":
         doExit = False
         while not doExit:
             pressed = ''.join(keys.key_check())
-            s.send(data_to_send[pressed])
+            print(pressed)
+            if pressed in data_to_send:
+                s.send(data_to_send[pressed])
             if pressed == 'K':
                 doExit = True
         s.close()
