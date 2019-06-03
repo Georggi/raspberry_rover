@@ -70,14 +70,18 @@ def back_turnRight():
 
 def forward():
     pwm_vals[1] = pwm_vals[2] = 0
-    pwm_vals[0] += 25
-    pwm_vals[3] += 25
+    if pwm_vals[0] < 100:
+        pwm_vals[0] += 25
+    if pwm_vals[3] < 100:
+        pwm_vals[3] += 25
 
 
 def back():
     pwm_vals[0] = pwm_vals[3] = 0
-    pwm_vals[1] += 25
-    pwm_vals[2] += 25
+    if pwm_vals[1] < 100:
+        pwm_vals[1] += 25
+    if pwm_vals[2] < 100:
+        pwm_vals[2] += 25
 
 
 def fastRight():
@@ -117,6 +121,10 @@ if __name__ == "__main__":
         pwm_right_back = gpio.PWM(13,1000)
         pwm_left_back = gpio.PWM(16,1000)
         pwm_left_forward = gpio.PWM(18,1000)
+        pwm_right_forward.start(0)
+        pwm_right_back.start(0)
+        pwm_left_back.start(0)
+        pwm_left_forward.start(0)
         s.settimeout(100)
         doExit = False
 
@@ -152,5 +160,9 @@ if __name__ == "__main__":
             execPWMChanges()
             print(data)
             s.send(bytes([255]))
+        pwm_right_forward.stop()
+        pwm_right_back.start()
+        pwm_left_back.start()
+        pwm_left_forward.start()
         gpio.cleanup()
         s.close()
