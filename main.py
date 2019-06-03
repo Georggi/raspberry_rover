@@ -92,7 +92,8 @@ def fastLeft():
 
 def gradualStop():
     for i in range(0, len(pwm_vals)):
-        pwm_vals[i] -= 12.5
+        if pwm_vals[i] > 0:
+            pwm_vals[i] -= 12.5
 
 def emergencyStop():
     for i in range(0, len(pwm_vals)):
