@@ -3,7 +3,7 @@ import time
 import socket
 
 
-ip = '37.25.11.30'
+ip = '185.175.245.51'
 port = 60100
 
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
