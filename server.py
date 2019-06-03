@@ -1,7 +1,7 @@
 import socket
 import keys
 import time
-host = "127.0.0.1"
+host = "192.168.0.173"
 port = 60100
 
 data_to_send = {
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         s.listen(5)
 
         conn, addr = s.accept()
-        print("receiver connection from " + addr)
+        print("receiver connection from " + addr[0])
         doExit = False
         while not doExit:
             pressed = ''.join(keys.key_check())

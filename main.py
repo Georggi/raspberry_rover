@@ -105,7 +105,7 @@ if __name__ == "__main__":
         except ConnectionRefusedError:
             print("Host server " + ip + ":" + str(port) + " not started")
             exit(1)
-
+        gpio.cleanup()
         gpio.setmode(gpio.BOARD)
         gpio.setup(11, gpio.OUT)
         gpio.setup(13, gpio.OUT)
