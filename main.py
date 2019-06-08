@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
         while not doExit:
             data = s.recv(1)
-            time.sleep(0.1)
+
             if data == bytes([0]):
                 gradualStop()
             elif data == bytes([1]):
@@ -172,6 +172,7 @@ if __name__ == "__main__":
                 doExit = True
             execPWMChanges()
             print(data)
+            time.sleep(0.1)
             s.send(bytes([255]))
         pwm_right_forward.stop()
         pwm_right_back.stop()
