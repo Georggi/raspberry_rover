@@ -17,7 +17,7 @@ data_to_send = {
     'shiftA': bytes([9]),
     'shiftD': bytes([10]),
     'K': bytes([255]), #exit
-    'P': bytes([127]) #emergency stop
+    'P': bytes([127]) #ssemergency stop
 }
 
 if __name__ == "__main__":

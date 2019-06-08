@@ -59,6 +59,8 @@ def back_turnLeft():
         pwm_vals[2] = pwm_vals[1] = 0
     if pwm_vals[1] < 100:
         pwm_vals[1] += 25
+    if pwm_vals[2] > 50:
+        pwm_vals[2] = 50
     if pwm_vals[2] < 50:
         pwm_vals[2] += 12.5
 
@@ -69,6 +71,8 @@ def back_turnRight():
         pwm_vals[2] = pwm_vals[1] = 0
     if pwm_vals[2] < 100:
         pwm_vals[2] += 25
+    if pwm_vals[1] > 50:
+        pwm_vals[1] = 50
     if pwm_vals[1] < 50:
         pwm_vals[1] += 12.5
 
