@@ -38,7 +38,7 @@ def forward_turnLeft():
     if pwm_vals[3] > pwm_vals[0]:
         pwm_vals[3] = pwm_vals[0] = 50
     if pwm_vals[0] < 100:
-        pwm_vals[0] += 25
+        pwm_vals[0] += 12.5
     if pwm_vals[3] > 50:
         pwm_vals[3] = 50
     if pwm_vals[3] < 50:
@@ -50,7 +50,7 @@ def forward_turnRight():
     if pwm_vals[0] > pwm_vals[3]:
         pwm_vals[3] = pwm_vals[0] = 50
     if pwm_vals[3] < 100:
-        pwm_vals[3] += 25
+        pwm_vals[3] += 12.5
     if pwm_vals[0] > 50:
         pwm_vals[0] = 50
     if pwm_vals[0] < 50:
@@ -62,7 +62,7 @@ def back_turnLeft():
     if pwm_vals[2] > pwm_vals[1]:
         pwm_vals[2] = pwm_vals[1] = 50
     if pwm_vals[1] < 100:
-        pwm_vals[1] += 25
+        pwm_vals[1] += 12.5
     if pwm_vals[2] > 50:
         pwm_vals[2] = 50
     if pwm_vals[2] < 50:
@@ -74,7 +74,7 @@ def back_turnRight():
     if pwm_vals[1] > pwm_vals[2]:
         pwm_vals[2] = pwm_vals[1] = 50
     if pwm_vals[2] < 100:
-        pwm_vals[2] += 25
+        pwm_vals[2] += 12.5
     if pwm_vals[1] > 50:
         pwm_vals[1] = 50
     if pwm_vals[1] < 50:
@@ -84,17 +84,17 @@ def back_turnRight():
 def forward():
     pwm_vals[1] = pwm_vals[2] = 0
     if pwm_vals[0] < 100:
-        pwm_vals[0] += 25
+        pwm_vals[0] += 12.5
     if pwm_vals[3] < 100:
-        pwm_vals[3] += 25
+        pwm_vals[3] += 12.5
 
 
 def back():
     pwm_vals[0] = pwm_vals[3] = 0
     if pwm_vals[1] < 100:
-        pwm_vals[1] += 25
+        pwm_vals[1] += 12.5
     if pwm_vals[2] < 100:
-        pwm_vals[2] += 25
+        pwm_vals[2] += 12.5
 
 
 def fastRight():
@@ -172,7 +172,7 @@ if __name__ == "__main__":
                 doExit = True
             execPWMChanges()
             print(data)
-            time.sleep(0.1)
+            time.sleep(0.05)
             s.send(bytes([255]))
         pwm_right_forward.stop()
         pwm_right_back.stop()
