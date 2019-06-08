@@ -36,7 +36,7 @@ def shift_turnLeft():
 def forward_turnLeft():
     pwm_vals[1] = pwm_vals[2] = 0
     if pwm_vals[3] > pwm_vals[0]:
-        pwm_vals[3] = pwm_vals[0] = 0
+        pwm_vals[3] = pwm_vals[0] = 50
     if pwm_vals[0] < 100:
         pwm_vals[0] += 25
     if pwm_vals[3] > 50:
@@ -48,7 +48,7 @@ def forward_turnLeft():
 def forward_turnRight():
     pwm_vals[1] = pwm_vals[2] = 0
     if pwm_vals[0] > pwm_vals[3]:
-        pwm_vals[3] = pwm_vals[0] = 0
+        pwm_vals[3] = pwm_vals[0] = 50
     if pwm_vals[3] < 100:
         pwm_vals[3] += 25
     if pwm_vals[0] > 50:
@@ -60,7 +60,7 @@ def forward_turnRight():
 def back_turnLeft():
     pwm_vals[3] = pwm_vals[0] = 0
     if pwm_vals[2] > pwm_vals[1]:
-        pwm_vals[2] = pwm_vals[1] = 0
+        pwm_vals[2] = pwm_vals[1] = 50
     if pwm_vals[1] < 100:
         pwm_vals[1] += 25
     if pwm_vals[2] > 50:
@@ -72,7 +72,7 @@ def back_turnLeft():
 def back_turnRight():
     pwm_vals[3] = pwm_vals[0] = 0
     if pwm_vals[1] > pwm_vals[2]:
-        pwm_vals[2] = pwm_vals[1] = 0
+        pwm_vals[2] = pwm_vals[1] = 50
     if pwm_vals[2] < 100:
         pwm_vals[2] += 25
     if pwm_vals[1] > 50:
