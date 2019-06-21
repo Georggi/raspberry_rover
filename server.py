@@ -3,8 +3,8 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 
-port = 3
-bluetooth = True
+port = 60100
+bluetooth = False
 data_to_send = {
     "": bytes([0]),
     'W': bytes([1]),
@@ -36,7 +36,7 @@ class StackGameApp(App):
             self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "192.168.0.173"
+            host = "192.168.0.161"
             self.s.bind((host, port))
             self.s.listen(5)
             self.conn, self.addr = self.s.accept()

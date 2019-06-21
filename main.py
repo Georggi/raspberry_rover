@@ -2,9 +2,9 @@ import RPi.GPIO as gpio
 import time
 import socket
 
-bluetooth = True
-ip = '185.175.245.51'
-port = 3
+bluetooth = False
+ip = '192.168.0.161'
+port = 60100
 
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
