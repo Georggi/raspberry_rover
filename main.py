@@ -1,8 +1,9 @@
 import RPi.GPIO as gpio
 import time
 import socket
+import select
 
-bluetooth = True
+bluetooth = False
 ip = '185.175.245.51'
 port = 60100
 
@@ -116,73 +117,84 @@ def emergencyStop():
     for i in range(0, len(pwm_vals)):
         pwm_vals[i] = 0
 
+def updateOnData(data):
+    doExit = None
+    if data == bytes([0]):
+        gradualStop()
+    elif data == bytes([1]):
+        forward()
+    elif data == bytes([2]):
+        back()
+    elif data == bytes([3]):
+        fastLeft()
+    elif data == bytes([4]):
+        fastRight()
+    elif data == bytes([5]):
+        forward_turnRight()
+    elif data == bytes([6]):
+        forward_turnLeft()
+    elif data == bytes([7]):
+        back_turnRight()
+    elif data == bytes([8]):
+        back_turnLeft()
+    elif data == bytes([9]):
+        shift_turnLeft()
+    elif data == bytes([10]):
+        shift_turnRight()
+    elif data == bytes([127]):
+        emergencyStop()
+    elif data == bytes([255]):
+        doExit = True
+    return doExit
+
 
 if __name__ == "__main__":
-    s = None
     if bluetooth:
         s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         ip = 'd4:38:9c:ae:59:23'
     else:
     
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setblocking(False)
+    try:
+        s.connect((ip,port))
+    except ConnectionRefusedError:
+        print("Host server " + ip + ":" + str(port) + " not started")
+        exit(1)
+
+    gpio.cleanup()
+    gpio.setmode(gpio.BOARD)
+    gpio.setup(11, gpio.OUT)
+    gpio.setup(13, gpio.OUT)
+    gpio.setup(16, gpio.OUT)
+    gpio.setup(18, gpio.OUT)
+    pwm_right_forward = gpio.PWM(11,1000)
+    pwm_right_back = gpio.PWM(13,1000)
+    pwm_left_back = gpio.PWM(16,1000)
+    pwm_left_forward = gpio.PWM(18,1000)
+    pwm_right_forward.start(0)
+    pwm_right_back.start(0)
+    pwm_left_back.start(0)
+    pwm_left_forward.start(0)
+    s.settimeout(0.05)
+    doExit = False
+    lastData = None
+    while not doExit:
         try:
-            s.connect((ip,port))
-        except ConnectionRefusedError:
-            print("Host server " + ip + ":" + str(port) + " not started")
-            exit(1)
-        gpio.cleanup()
-        gpio.setmode(gpio.BOARD)
-        gpio.setup(11, gpio.OUT)
-        gpio.setup(13, gpio.OUT)
-        gpio.setup(16, gpio.OUT)
-        gpio.setup(18, gpio.OUT)
-        pwm_right_forward = gpio.PWM(11,1000)
-        pwm_right_back = gpio.PWM(13,1000)
-        pwm_left_back = gpio.PWM(16,1000)
-        pwm_left_forward = gpio.PWM(18,1000)
-        pwm_right_forward.start(0)
-        pwm_right_back.start(0)
-        pwm_left_back.start(0)
-        pwm_left_forward.start(0)
-        s.settimeout(100)
-        doExit = False
-
-        while not doExit:
             data = s.recv(1)
-
-            if data == bytes([0]):
-                gradualStop()
-            elif data == bytes([1]):
-                forward()
-            elif data == bytes([2]):
-                back()
-            elif data == bytes([3]):
-                fastLeft()
-            elif data == bytes([4]):
-                fastRight()
-            elif data == bytes([5]):
-                forward_turnRight()
-            elif data == bytes([6]):
-                forward_turnLeft()
-            elif data == bytes([7]):
-                back_turnRight()
-            elif data == bytes([8]):
-                back_turnLeft()
-            elif data == bytes([9]):
-                shift_turnLeft()
-            elif data == bytes([10]):
-                shift_turnRight()
-            elif data == bytes([127]):
-                emergencyStop()
-            elif data == bytes([255]):
-                doExit = True
+            lastData = data
+            updateOnData(data)
             execPWMChanges()
             print(data)
             time.sleep(0.05)
             s.send(bytes([255]))
-        pwm_right_forward.stop()
-        pwm_right_back.stop()
-        pwm_left_back.stop()
-        pwm_left_forward.stop()
-        gpio.cleanup()
-        s.close()
+        except TimeoutError:
+            updateOnData(lastData)
+            execPWMChanges()
+
+    pwm_right_forward.stop()
+    pwm_right_back.stop()
+    pwm_left_back.stop()
+    pwm_left_forward.stop()
+    gpio.cleanup()
+    s.close()
