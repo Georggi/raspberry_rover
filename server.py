@@ -23,6 +23,11 @@ data_to_send = {
     'P': bytes([127]) #ssemergency stop
 }
 
+button_dict = {
+    "down" : True,
+    "normal" : False
+}
+
 class StackGameApp(App):
 
     def __init__(self):
@@ -46,22 +51,28 @@ class StackGameApp(App):
         App.__init__(self)
 
     def callback_forw(self, instance, value):
-        self.W_pressed = value
+        self.W_pressed = button_dict[value]
+        self.exec_sending()
 
     def callback_back(self, instance, value):
-        self.S_pressed = value
+        self.S_pressed = button_dict[value]
+        self.exec_sending()
 
     def callback_left(self, instance, value):
-        self.A_pressed = value
+        self.A_pressed = button_dict[value]
+        self.exec_sending()
 
     def callback_right(self, instance, value):
-        self.D_pressed = value
+        self.D_pressed = button_dict[value]
+        self.exec_sending()
 
     def callback_shift(self, instance, value):
-        self.Shift_pressed = value
+        self.Shift_pressed = button_dict[value]
+        self.exec_sending()
 
     def callback_stop(self, instance, value):
-        self.doExit = value
+        self.doExit = button_dict[value]
+        self.exec_sending()
 
     def exec_sending(self):
         if self.doExit:
@@ -98,7 +109,7 @@ class StackGameApp(App):
             self.conn.send(data_to_send['shiftD'])
             self.conn.recv(1)
         else:
-            self.conn.send(data_to_send[''])
+            self.conn.send(data_to_send[""])
             self.conn.recv(1)
 
     def build(self):
@@ -127,22 +138,4 @@ class StackGameApp(App):
         return layout
 
 if __name__ == "__main__":
-
     StackGameApp().run()
-
-
-
-    #time.sleep(1)
-
-    #while not doExit:
-
-     #   pressed = ''.join(keys.key_check())
-      #  print(pressed)
-       # if pressed in data_to_send.keys():
-        #    conn.send(data_to_send[pressed])
-         #   data = conn.recv(1)
-        #if pressed == 'K':
-         #   doExit = True
-
-#    s.close()
-

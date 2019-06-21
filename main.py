@@ -1,7 +1,6 @@
 import RPi.GPIO as gpio
 import time
 import socket
-import select
 
 bluetooth = False
 ip = '185.175.245.51'
@@ -10,9 +9,7 @@ port = 60100
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
 
-
 def execPWMChanges():
-    print(pwm_vals)
     for i in range(0, len(pwm_vals)):
         if pwm_vals[i] > 100:
             pwm_vals[i] = 100
@@ -117,7 +114,9 @@ def emergencyStop():
     for i in range(0, len(pwm_vals)):
         pwm_vals[i] = 0
 
+
 def updateOnData(data):
+
     doExit = None
     if data == bytes([0]):
         gradualStop()
@@ -183,7 +182,6 @@ if __name__ == "__main__":
             lastData = data
             updateOnData(data)
             execPWMChanges()
-            print(data)
             time.sleep(0.05)
             s.send(bytes([255]))
         except socket.timeout:
