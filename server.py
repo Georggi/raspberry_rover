@@ -3,7 +3,7 @@ import keys
 import time
 host = "192.168.0.173"
 port = 60100
-
+bluetooth = True
 data_to_send = {
     "" : bytes([0]),
     'W' : bytes([1]),
@@ -21,7 +21,12 @@ data_to_send = {
 }
 
 if __name__ == "__main__":
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s = None
+    if bluetooth:
+        s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        host='d4:38:9c:ae:59:23'
+    else:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((host, port))
         s.listen(5)
 

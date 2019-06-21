@@ -2,7 +2,7 @@ import RPi.GPIO as gpio
 import time
 import socket
 
-
+bluetooth = True
 ip = '185.175.245.51'
 port = 60100
 
@@ -118,7 +118,13 @@ def emergencyStop():
 
 
 if __name__ == "__main__":
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s = None
+    if bluetooth:
+        s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        ip = 'd4:38:9c:ae:59:23'
+    else:
+    
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((ip,port))
         except ConnectionRefusedError:
