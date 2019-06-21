@@ -153,9 +153,7 @@ if __name__ == "__main__":
         s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         ip = 'd4:38:9c:ae:59:23'
     else:
-    
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setblocking(False)
     try:
         s.connect((ip,port))
     except ConnectionRefusedError:
@@ -178,7 +176,7 @@ if __name__ == "__main__":
     pwm_left_forward.start(0)
     s.settimeout(0.05)
     doExit = False
-    lastData = None
+    lastData = ""
     while not doExit:
         try:
             data = s.recv(1)
@@ -188,7 +186,7 @@ if __name__ == "__main__":
             print(data)
             time.sleep(0.05)
             s.send(bytes([255]))
-        except TimeoutError:
+        except socket.timeout:
             updateOnData(lastData)
             execPWMChanges()
 

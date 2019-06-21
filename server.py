@@ -8,8 +8,8 @@ from kivy.uix.button import Button
 port = 60100
 bluetooth = False
 data_to_send = {
-    "" : bytes([0]),
-    'W' : bytes([1]),
+    "": bytes([0]),
+    'W': bytes([1]),
     'S': bytes([2]),
     'A': bytes([3]),
     'D': bytes([4]),
@@ -26,6 +26,17 @@ data_to_send = {
 class StackGameApp(App):
 
     def __init__(self):
+        if bluetooth:
+            self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+            host = 'd4:38:9c:ae:59:23'
+        else:
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            host = "192.168.0.173"
+        self.s.bind((host, port))
+        self.s.listen(5)
+
+        self.conn, self.addr = self.s.accept()
+        print("received connection from " + self.addr[0])
         self.W_pressed = False
         self.S_pressed = False
         self.A_pressed = False
@@ -112,17 +123,7 @@ class StackGameApp(App):
         layout.add_widget(buttonright)
         layout.add_widget(buttonshift)
         layout.add_widget(buttonstop)
-        """if bluetooth:
-            self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            host = 'd4:38:9c:ae:59:23'
-        else:
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "192.168.0.173"
-        self.s.bind((host, port))
-        self.s.listen(5)
 
-        self.conn, self.addr = self.s.accept()
-        print("received connection from " + addr[0])"""
         return layout
 
 if __name__ == "__main__":
