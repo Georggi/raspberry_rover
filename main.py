@@ -2,7 +2,7 @@ import RPi.GPIO as gpio
 import time
 import socket
 
-bluetooth = False
+bluetooth = True
 ip = '185.175.245.51'
 port = 60100
 
