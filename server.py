@@ -5,7 +5,7 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 
-port = 60100
+port = 3
 bluetooth = True
 data_to_send = {
     "": bytes([0]),

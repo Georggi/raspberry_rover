@@ -4,7 +4,7 @@ import socket
 
 bluetooth = True
 ip = '185.175.245.51'
-port = 60100
+port = 3
 
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
