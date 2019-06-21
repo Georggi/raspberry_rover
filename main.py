@@ -150,14 +150,18 @@ def updateOnData(data):
 if __name__ == "__main__":
     if bluetooth:
         s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        ip = 'd4:38:9c:ae:59:23'
+        ip = 'b8:27:eb:3e:b8:0a'
+        s.bind((ip, port))
+        s.listen(5)
+        s, addr = s.accept()
+        print("received connection from " + addr[0])
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((ip,port))
-    except ConnectionRefusedError:
-        print("Host server " + ip + ":" + str(port) + " not started")
-        exit(1)
+        try:
+            s.connect((ip,port))
+        except ConnectionRefusedError:
+            print("Host server " + ip + ":" + str(port) + " not started")
+            exit(1)
 
     gpio.cleanup()
     gpio.setmode(gpio.BOARD)

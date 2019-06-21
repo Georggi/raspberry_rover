@@ -1,6 +1,4 @@
 import socket
-import keys
-import time
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -33,15 +31,17 @@ class StackGameApp(App):
     def __init__(self):
         if bluetooth:
             self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            host = 'd4:38:9c:ae:59:23'
+            host = 'b8:27:eb:3e:b8:0a'
+            self.s.connect((host, port))
+            self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             host = "192.168.0.173"
-        self.s.bind((host, port))
-        self.s.listen(5)
+            self.s.bind((host, port))
+            self.s.listen(5)
+            self.conn, self.addr = self.s.accept()
+            print("received connection from " + self.addr[0])
 
-        self.conn, self.addr = self.s.accept()
-        print("received connection from " + self.addr[0])
         self.W_pressed = False
         self.S_pressed = False
         self.A_pressed = False
