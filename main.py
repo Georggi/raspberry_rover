@@ -1,200 +1,141 @@
-import RPi.GPIO as gpio
-import time
 import socket
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 
-bluetooth = False
-ip = '192.168.0.161'
 port = 60100
+bluetooth = False
+data_to_send = {
+    "": bytes([0]),
+    'W': bytes([1]),
+    'S': bytes([2]),
+    'A': bytes([3]),
+    'D': bytes([4]),
+    'DW': bytes([5]),
+    'AW': bytes([6]),
+    'DS': bytes([7]),
+    'AS': bytes([8]),
+    'shiftA': bytes([9]),
+    'shiftD': bytes([10]),
+    'K': bytes([255]), #exit
+    'P': bytes([127]) #ssemergency stop
+}
 
-pwm_vals = [0.0, 0.0, 0.0, 0.0]
+button_dict = {
+    "down": True,
+    "normal": False
+}
 
+class StackGameApp(App):
 
-def execPWMChanges():
-    for i in range(0, len(pwm_vals)):
-        if pwm_vals[i] > 100:
-            pwm_vals[i] = 100
-        if pwm_vals[i] < 0:
-            pwm_vals[i] = 0
-    pwm_right_forward.ChangeDutyCycle(pwm_vals[0])
-    pwm_right_back.ChangeDutyCycle(pwm_vals[1])
-    pwm_left_back.ChangeDutyCycle(pwm_vals[2])
-    pwm_left_forward.ChangeDutyCycle(pwm_vals[3])
+    def __init__(self):
+        if bluetooth:
+            self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+            host = 'b8:27:eb:3e:b8:0a'
+            self.s.connect((host, port))
+            self.conn = self.s
+        else:
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            host = "192.168.0.173"
+            self.s.bind((host, port))
+            self.s.listen(5)
+            self.conn, self.addr = self.s.accept()
+            #print("received connection from " + self.addr[0])
 
+        self.W_pressed = False
+        self.S_pressed = False
+        self.A_pressed = False
+        self.D_pressed = False
+        self.Shift_pressed = False
+        self.doExit = False
+        App.__init__(self)
 
-def shift_turnRight():
-    pwm_vals[0] = pwm_vals[1] = pwm_vals[2] = 0
-    pwm_vals[3] = 100
+    def callback_forw(self, instance, value):
+        self.W_pressed = button_dict[value]
+        self.exec_sending()
 
+    def callback_back(self, instance, value):
+        self.S_pressed = button_dict[value]
+        self.exec_sending()
 
-def shift_turnLeft():
-    pwm_vals[3] = pwm_vals[1] = pwm_vals[2] = 0
-    pwm_vals[0] = 100
+    def callback_left(self, instance, value):
+        self.A_pressed = button_dict[value]
+        self.exec_sending()
 
+    def callback_right(self, instance, value):
+        self.D_pressed = button_dict[value]
+        self.exec_sending()
 
-def forward_turnLeft():
-    pwm_vals[1] = pwm_vals[2] = 0
-    if pwm_vals[3] > pwm_vals[0]:
-        pwm_vals[3] = pwm_vals[0] = 50
-    if pwm_vals[0] < 100:
-        pwm_vals[0] += 12.5
-    if pwm_vals[3] > 50:
-        pwm_vals[3] = 50
-    if pwm_vals[3] < 50:
-        pwm_vals[3] += 12.5
+    def callback_shift(self, instance, value):
+        self.Shift_pressed = button_dict[value]
+        self.exec_sending()
 
+    def callback_stop(self, instance, value):
+        self.doExit = button_dict[value]
+        self.exec_sending()
 
-def forward_turnRight():
-    pwm_vals[1] = pwm_vals[2] = 0
-    if pwm_vals[0] > pwm_vals[3]:
-        pwm_vals[3] = pwm_vals[0] = 50
-    if pwm_vals[3] < 100:
-        pwm_vals[3] += 12.5
-    if pwm_vals[0] > 50:
-        pwm_vals[0] = 50
-    if pwm_vals[0] < 50:
-        pwm_vals[0] += 12.5
+    def exec_sending(self):
+        if self.doExit:
+            self.conn.send(data_to_send['K'])
+            self.stop()
+        elif self.W_pressed and not (self.D_pressed or self.A_pressed or self.S_pressed):
+            self.conn.send(data_to_send['W'])
+            self.conn.recv(1)
+        elif self.S_pressed and not (self.D_pressed or self.A_pressed or self.W_pressed):
+            self.conn.send(data_to_send['S'])
+            self.conn.recv(1)
+        elif self.A_pressed and not (self.D_pressed or self.S_pressed or self.W_pressed):
+            self.conn.send(data_to_send['A'])
+            self.conn.recv(1)
+        elif self.D_pressed and not (self.A_pressed or self.S_pressed or self.W_pressed):
+            self.conn.send(data_to_send['D'])
+            self.conn.recv(1)
+        elif self.W_pressed and self.D_pressed and not (self.A_pressed or self.S_pressed):
+            self.conn.send(data_to_send['DW'])
+            self.conn.recv(1)
+        elif self.W_pressed and self.A_pressed and not (self.D_pressed or self.S_pressed):
+            self.conn.send(data_to_send['AW'])
+            self.conn.recv(1)
+        elif self.S_pressed and self.D_pressed and not (self.W_pressed or self.A_pressed):
+            self.conn.send(data_to_send['DS'])
+            self.conn.recv(1)
+        elif self.S_pressed and self.A_pressed and not (self.W_pressed or self.D_pressed):
+            self.conn.send(data_to_send['AS'])
+            self.conn.recv(1)
+        elif self.Shift_pressed and self.A_pressed and not (self.W_pressed or self.D_pressed or self.S_pressed):
+            self.conn.send(data_to_send['shiftA'])
+            self.conn.recv(1)
+        elif self.Shift_pressed and self.D_pressed and not (self.W_pressed or self.A_pressed or self.S_pressed):
+            self.conn.send(data_to_send['shiftD'])
+            self.conn.recv(1)
+        else:
+            self.conn.send(data_to_send[""])
+            self.conn.recv(1)
 
+    def build(self):
 
-def back_turnLeft():
-    pwm_vals[3] = pwm_vals[0] = 0
-    if pwm_vals[2] > pwm_vals[1]:
-        pwm_vals[2] = pwm_vals[1] = 50
-    if pwm_vals[1] < 100:
-        pwm_vals[1] += 12.5
-    if pwm_vals[2] > 50:
-        pwm_vals[2] = 50
-    if pwm_vals[2] < 50:
-        pwm_vals[2] += 12.5
+        layout = BoxLayout(orientation='vertical')
 
+        buttonforw = Button(text='forward')
+        buttonforw.bind(state=self.callback_forw)
+        buttonback = Button(text='back')
+        buttonback.bind(state=self.callback_back)
+        buttonleft = Button(text='left')
+        buttonleft.bind(state=self.callback_left)
+        buttonright = Button(text='right')
+        buttonright.bind(state=self.callback_right)
+        buttonshift = Button(text='shift')
+        buttonshift.bind(state=self.callback_shift)
+        buttonstop = Button(text='stop')
+        buttonstop.bind(state=self.callback_stop)
+        layout.add_widget(buttonforw)
+        layout.add_widget(buttonback)
+        layout.add_widget(buttonleft)
+        layout.add_widget(buttonright)
+        layout.add_widget(buttonshift)
+        layout.add_widget(buttonstop)
 
-def back_turnRight():
-    pwm_vals[3] = pwm_vals[0] = 0
-    if pwm_vals[1] > pwm_vals[2]:
-        pwm_vals[2] = pwm_vals[1] = 50
-    if pwm_vals[2] < 100:
-        pwm_vals[2] += 12.5
-    if pwm_vals[1] > 50:
-        pwm_vals[1] = 50
-    if pwm_vals[1] < 50:
-        pwm_vals[1] += 12.5
-
-
-def forward():
-    pwm_vals[1] = pwm_vals[2] = 0
-    if pwm_vals[0] < 100:
-        pwm_vals[0] += 12.5
-    if pwm_vals[3] < 100:
-        pwm_vals[3] += 12.5
-
-
-def back():
-    pwm_vals[0] = pwm_vals[3] = 0
-    if pwm_vals[1] < 100:
-        pwm_vals[1] += 12.5
-    if pwm_vals[2] < 100:
-        pwm_vals[2] += 12.5
-
-
-def fastRight():
-    pwm_vals[0] = pwm_vals[2] = 0
-    pwm_vals[3] = pwm_vals[1] = 35
-
-
-def fastLeft():
-    pwm_vals[3] = pwm_vals[1] = 0
-    pwm_vals[0] = pwm_vals[2] = 35
-
-
-def gradualStop():
-    for i in range(0, len(pwm_vals)):
-        if pwm_vals[i] > 0:
-            pwm_vals[i] -= 12.5
-
-def emergencyStop():
-    for i in range(0, len(pwm_vals)):
-        pwm_vals[i] = 0
-
-
-def updateOnData(data):
-
-    doExit = None
-    if data == bytes([0]):
-        gradualStop()
-    elif data == bytes([1]):
-        forward()
-    elif data == bytes([2]):
-        back()
-    elif data == bytes([3]):
-        fastLeft()
-    elif data == bytes([4]):
-        fastRight()
-    elif data == bytes([5]):
-        forward_turnRight()
-    elif data == bytes([6]):
-        forward_turnLeft()
-    elif data == bytes([7]):
-        back_turnRight()
-    elif data == bytes([8]):
-        back_turnLeft()
-    elif data == bytes([9]):
-        shift_turnLeft()
-    elif data == bytes([10]):
-        shift_turnRight()
-    elif data == bytes([127]):
-        emergencyStop()
-    elif data == bytes([255]):
-        doExit = True
-    return doExit
-
+        return layout
 
 if __name__ == "__main__":
-    if bluetooth:
-        s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        ip = 'b8:27:eb:3e:b8:0a'
-        s.bind((ip, port))
-        s.listen(5)
-        s, addr = s.accept()
-        print("received connection from " + addr[0])
-    else:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.connect((ip,port))
-        except ConnectionRefusedError:
-            print("Host server " + ip + ":" + str(port) + " not started")
-            exit(1)
-
-    gpio.cleanup()
-    gpio.setmode(gpio.BOARD)
-    gpio.setup(11, gpio.OUT)
-    gpio.setup(13, gpio.OUT)
-    gpio.setup(16, gpio.OUT)
-    gpio.setup(18, gpio.OUT)
-    pwm_right_forward = gpio.PWM(11,1000)
-    pwm_right_back = gpio.PWM(13,1000)
-    pwm_left_back = gpio.PWM(16,1000)
-    pwm_left_forward = gpio.PWM(18,1000)
-    pwm_right_forward.start(0)
-    pwm_right_back.start(0)
-    pwm_left_back.start(0)
-    pwm_left_forward.start(0)
-    s.settimeout(0.05)
-    doExit = False
-    lastData = ""
-    while not doExit:
-        try:
-            data = s.recv(1)
-            lastData = data
-            updateOnData(data)
-            execPWMChanges()
-            time.sleep(0.05)
-            s.send(bytes([255]))
-        except socket.timeout:
-            updateOnData(lastData)
-            execPWMChanges()
-
-    pwm_right_forward.stop()
-    pwm_right_back.stop()
-    pwm_left_back.stop()
-    pwm_left_forward.stop()
-    gpio.cleanup()
-    s.close()
+    StackGameApp().run()
