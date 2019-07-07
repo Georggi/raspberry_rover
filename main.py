@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 import time
+import getIP
 
 port = 60100
 bluetooth = False
@@ -37,7 +38,7 @@ class StackGameApp(App):
             self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = socket.gethostbyname(socket.gethostname())
+            host = getIP.getIP()
             self.s.bind((host, port))
             self.s.listen(5)
             self.conn, self.addr = self.s.accept()
