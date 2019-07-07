@@ -2,6 +2,7 @@ import socket
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+import time
 
 port = 60100
 bluetooth = False
@@ -36,7 +37,7 @@ class StackGameApp(App):
             self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "192.168.0.173"
+            host = socket.gethostbyname(socket.gethostname())
             self.s.bind((host, port))
             self.s.listen(5)
             self.conn, self.addr = self.s.accept()
@@ -48,6 +49,7 @@ class StackGameApp(App):
         self.D_pressed = False
         self.Shift_pressed = False
         self.doExit = False
+        print("init")
         App.__init__(self)
 
     def callback_forw(self, instance, value):
@@ -77,6 +79,7 @@ class StackGameApp(App):
     def exec_sending(self):
         if self.doExit:
             self.conn.send(data_to_send['K'])
+            time.sleep(0.5)
             self.stop()
         elif self.W_pressed and not (self.D_pressed or self.A_pressed or self.S_pressed):
             self.conn.send(data_to_send['W'])
@@ -84,10 +87,10 @@ class StackGameApp(App):
         elif self.S_pressed and not (self.D_pressed or self.A_pressed or self.W_pressed):
             self.conn.send(data_to_send['S'])
             self.conn.recv(1)
-        elif self.A_pressed and not (self.D_pressed or self.S_pressed or self.W_pressed):
+        elif self.A_pressed and not (self.D_pressed or self.S_pressed or self.W_pressed or self.Shift_pressed):
             self.conn.send(data_to_send['A'])
             self.conn.recv(1)
-        elif self.D_pressed and not (self.A_pressed or self.S_pressed or self.W_pressed):
+        elif self.D_pressed and not (self.A_pressed or self.S_pressed or self.W_pressed or self.Shift_pressed):
             self.conn.send(data_to_send['D'])
             self.conn.recv(1)
         elif self.W_pressed and self.D_pressed and not (self.A_pressed or self.S_pressed):
@@ -113,7 +116,7 @@ class StackGameApp(App):
             self.conn.recv(1)
 
     def build(self):
-
+        print("build")
         layout = BoxLayout(orientation='vertical')
 
         buttonforw = Button(text='forward')
