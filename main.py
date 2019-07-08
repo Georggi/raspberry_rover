@@ -19,8 +19,8 @@ data_to_send = {
     'AS': bytes([8]),
     'shiftA': bytes([9]),
     'shiftD': bytes([10]),
-    'K': bytes([255]), #exit
-    'P': bytes([127]) #ssemergency stop
+    'K': bytes([255]),#exit
+    'P': bytes([127])#emergency stop
 }
 
 button_dict = {
@@ -38,7 +38,7 @@ class StackGameApp(App):
             self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = getIP.getIP()
+            host = "192.168.43.1"
             self.s.bind((host, port))
             self.s.listen(5)
             self.conn, self.addr = self.s.accept()
