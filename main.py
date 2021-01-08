@@ -32,21 +32,23 @@ button_dict = {
 }
 
 
-class StackGameApp(App):
-    def __init__(self):
-        if bluetooth:
-            self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            self.s.connect((host, port))
-            self.conn = self.s
-        else:
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.bind((host, port))
-            self.s.listen(5)
-            self.conn, self.addr = self.s.accept()
+class RoverControllerApp(App):
+    def __init__(self, no_send=False):
+        self.no_send = no_send
+        if not self.no_send:
+            if bluetooth:
+                self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+                self.s.connect((host, port))
+                self.conn = self.s
+            else:
+                self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.s.bind((host, port))
+                self.s.listen(5)
+                self.conn, self.addr = self.s.accept()
 
         self.W_pressed = self.S_pressed = self.A_pressed = self.D_pressed = self.Shift_pressed = self.doExit = False
         logging.info("Initialization done")
-        App.__init__(self)
+        super().__init__()
 
     def callback_forw(self, _, value):
         self.W_pressed = button_dict[value]
@@ -73,6 +75,8 @@ class StackGameApp(App):
         self.exec_sending()
 
     def exec_sending(self):
+        if self.no_send:
+            return
         if self.doExit:
             self.conn.send(data_to_send['K'])
             time.sleep(0.5)
@@ -138,4 +142,4 @@ class StackGameApp(App):
 
 
 if __name__ == "__main__":
-    StackGameApp().run()
+    RoverControllerApp().run()
