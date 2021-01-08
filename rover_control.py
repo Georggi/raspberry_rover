@@ -1,6 +1,12 @@
-import RPi.GPIO as gpio
-import time
+# try:
+#     pass
+#     #import RPi.GPIO as gpio
+# except ImportError as e:
+import logging
 import socket
+import time
+
+import RPiSim.GPIO as gpio
 
 bluetooth = False
 ip = '192.168.0.161'
@@ -9,8 +15,8 @@ port = 60100
 pwm_vals = [0.0, 0.0, 0.0, 0.0]
 
 
-def execPWMChanges():
-    for i in range(0, len(pwm_vals)):
+def execute_pwm_changes():
+    for i in range(len(pwm_vals)):
         if pwm_vals[i] > 100:
             pwm_vals[i] = 100
         if pwm_vals[i] < 0:
@@ -21,17 +27,17 @@ def execPWMChanges():
     pwm_left_forward.ChangeDutyCycle(pwm_vals[3])
 
 
-def shift_turnRight():
+def shift_turn_right():
     pwm_vals[0] = pwm_vals[1] = pwm_vals[2] = 0
     pwm_vals[3] = 100
 
 
-def shift_turnLeft():
+def shift_turn_left():
     pwm_vals[3] = pwm_vals[1] = pwm_vals[2] = 0
     pwm_vals[0] = 100
 
 
-def forward_turnLeft():
+def forward_turn_left():
     pwm_vals[1] = pwm_vals[2] = 0
     if pwm_vals[3] > pwm_vals[0]:
         pwm_vals[3] = pwm_vals[0] = 50
@@ -43,7 +49,7 @@ def forward_turnLeft():
         pwm_vals[3] += 12.5
 
 
-def forward_turnRight():
+def forward_turn_right():
     pwm_vals[1] = pwm_vals[2] = 0
     if pwm_vals[0] > pwm_vals[3]:
         pwm_vals[3] = pwm_vals[0] = 50
@@ -55,7 +61,7 @@ def forward_turnRight():
         pwm_vals[0] += 12.5
 
 
-def back_turnLeft():
+def back_turn_left():
     pwm_vals[3] = pwm_vals[0] = 0
     if pwm_vals[2] > pwm_vals[1]:
         pwm_vals[2] = pwm_vals[1] = 50
@@ -67,7 +73,7 @@ def back_turnLeft():
         pwm_vals[2] += 12.5
 
 
-def back_turnRight():
+def back_turn_right():
     pwm_vals[3] = pwm_vals[0] = 0
     if pwm_vals[1] > pwm_vals[2]:
         pwm_vals[2] = pwm_vals[1] = 50
@@ -95,56 +101,51 @@ def back():
         pwm_vals[2] += 12.5
 
 
-def fastRight():
+def fast_right():
     pwm_vals[0] = pwm_vals[2] = 0
     pwm_vals[3] = pwm_vals[1] = 35
 
 
-def fastLeft():
+def fast_left():
     pwm_vals[3] = pwm_vals[1] = 0
     pwm_vals[0] = pwm_vals[2] = 35
 
 
-def gradualStop():
+def gradual_stop():
     for i in range(0, len(pwm_vals)):
         if pwm_vals[i] > 0:
             pwm_vals[i] -= 12.5
 
-def emergencyStop():
+
+def emergency_stop():
     for i in range(0, len(pwm_vals)):
         pwm_vals[i] = 0
 
 
-def updateOnData(data):
+def set_exit():
+    global doExit
+    doExit = False
 
-    doExit = None
-    if data == bytes([0]):
-        gradualStop()
-    elif data == bytes([1]):
-        forward()
-    elif data == bytes([2]):
-        back()
-    elif data == bytes([3]):
-        fastLeft()
-    elif data == bytes([4]):
-        fastRight()
-    elif data == bytes([5]):
-        forward_turnRight()
-    elif data == bytes([6]):
-        forward_turnLeft()
-    elif data == bytes([7]):
-        back_turnRight()
-    elif data == bytes([8]):
-        back_turnLeft()
-    elif data == bytes([9]):
-        shift_turnLeft()
-    elif data == bytes([10]):
-        shift_turnRight()
-    elif data == bytes([127]):
-        emergencyStop()
-    elif data == bytes([255]):
-        doExit = True
-    return doExit
+
+send_to_func = {
+    b'\x00': gradual_stop,
+    b'\x01': forward,
+    b'\x02': back,
+    b'\x03': fast_left,
+    b'\x04': fast_right,
+    b'\x05': forward_turn_right,
+    b'\x06': back_turn_right,
+    b'\x07': back_turn_right,
+    b'\x08': back_turn_left,
+    b'\x09': shift_turn_left,
+    b'\x10': shift_turn_right,
+    b'\xff': set_exit,  # exit
+    b'\x7f': emergency_stop  # emergency stop
+}
+
+
+def update_on_data(data):
+    send_to_func[data]()
 
 
 if __name__ == "__main__":
@@ -154,13 +155,13 @@ if __name__ == "__main__":
         s.bind((ip, port))
         s.listen(5)
         s, addr = s.accept()
-        print("received connection from " + addr[0])
+        logging.info(f"received connection from {addr[0]}")
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect((ip,port))
+            s.connect((ip, port))
         except ConnectionRefusedError:
-            print("Host server " + ip + ":" + str(port) + " not started")
+            logging.error(f"Host server {ip}:{port} not started")
             exit(1)
 
     gpio.cleanup()
@@ -169,28 +170,28 @@ if __name__ == "__main__":
     gpio.setup(13, gpio.OUT)
     gpio.setup(16, gpio.OUT)
     gpio.setup(18, gpio.OUT)
-    pwm_right_forward = gpio.PWM(11,1000)
-    pwm_right_back = gpio.PWM(13,1000)
-    pwm_left_back = gpio.PWM(16,1000)
-    pwm_left_forward = gpio.PWM(18,1000)
+    pwm_right_forward = gpio.PWM(11, 1000)
+    pwm_right_back = gpio.PWM(13, 1000)
+    pwm_left_back = gpio.PWM(16, 1000)
+    pwm_left_forward = gpio.PWM(18, 1000)
     pwm_right_forward.start(0)
     pwm_right_back.start(0)
     pwm_left_back.start(0)
     pwm_left_forward.start(0)
     s.settimeout(0.05)
     doExit = False
-    lastData = ""
+    lastData = b""
     while not doExit:
         try:
             data = s.recv(1)
             lastData = data
-            updateOnData(data)
-            execPWMChanges()
+            update_on_data(data)
+            execute_pwm_changes()
             time.sleep(0.05)
-            s.send(bytes([255]))
+            s.send(b'\xff')
         except socket.timeout:
-            updateOnData(lastData)
-            execPWMChanges()
+            update_on_data(lastData)
+            execute_pwm_changes()
 
     pwm_right_forward.stop()
     pwm_right_back.stop()

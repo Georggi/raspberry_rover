@@ -1,26 +1,29 @@
+import logging
 import socket
+import time
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-import time
-import getIP
 
-port = 60100
 bluetooth = False
+host = 'b8:27:eb:3e:b8:0a' if bluetooth else "0.0.0.0"
+port = 60100
+
 data_to_send = {
-    "": bytes([0]),
-    'W': bytes([1]),
-    'S': bytes([2]),
-    'A': bytes([3]),
-    'D': bytes([4]),
-    'DW': bytes([5]),
-    'AW': bytes([6]),
-    'DS': bytes([7]),
-    'AS': bytes([8]),
-    'shiftA': bytes([9]),
-    'shiftD': bytes([10]),
-    'K': bytes([255]),#exit
-    'P': bytes([127])#emergency stop
+    "": b'\x00',
+    'W': b'\x01',
+    'S': b'\x02',
+    'A': b'\x03',
+    'D': b'\x04',
+    'DW': b'\x05',
+    'AW': b'\x06',
+    'DS': b'\x07',
+    'AS': b'\x08',
+    'shiftA': b'\x09',
+    'shiftD': b'\x10',
+    'K': b'\xff',  # exit
+    'P': b'\x7f'  # emergency stop
 }
 
 button_dict = {
@@ -28,52 +31,44 @@ button_dict = {
     "normal": False
 }
 
-class StackGameApp(App):
 
+class StackGameApp(App):
     def __init__(self):
         if bluetooth:
             self.s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            host = 'b8:27:eb:3e:b8:0a'
             self.s.connect((host, port))
             self.conn = self.s
         else:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "192.168.43.1"
             self.s.bind((host, port))
             self.s.listen(5)
             self.conn, self.addr = self.s.accept()
-            #print("received connection from " + self.addr[0])
 
-        self.W_pressed = False
-        self.S_pressed = False
-        self.A_pressed = False
-        self.D_pressed = False
-        self.Shift_pressed = False
-        self.doExit = False
-        print("init")
+        self.W_pressed = self.S_pressed = self.A_pressed = self.D_pressed = self.Shift_pressed = self.doExit = False
+        logging.info("Initialization done")
         App.__init__(self)
 
-    def callback_forw(self, instance, value):
+    def callback_forw(self, _, value):
         self.W_pressed = button_dict[value]
         self.exec_sending()
 
-    def callback_back(self, instance, value):
+    def callback_back(self, _, value):
         self.S_pressed = button_dict[value]
         self.exec_sending()
 
-    def callback_left(self, instance, value):
+    def callback_left(self, _, value):
         self.A_pressed = button_dict[value]
         self.exec_sending()
 
-    def callback_right(self, instance, value):
+    def callback_right(self, _, value):
         self.D_pressed = button_dict[value]
         self.exec_sending()
 
-    def callback_shift(self, instance, value):
+    def callback_shift(self, _, value):
         self.Shift_pressed = button_dict[value]
         self.exec_sending()
 
-    def callback_stop(self, instance, value):
+    def callback_stop(self, _, value):
         self.doExit = button_dict[value]
         self.exec_sending()
 
@@ -117,7 +112,7 @@ class StackGameApp(App):
             self.conn.recv(1)
 
     def build(self):
-        print("build")
+        logging.info("Building app")
         layout = BoxLayout(orientation='vertical')
 
         buttonforw = Button(text='forward')
@@ -140,6 +135,7 @@ class StackGameApp(App):
         layout.add_widget(buttonstop)
 
         return layout
+
 
 if __name__ == "__main__":
     StackGameApp().run()
